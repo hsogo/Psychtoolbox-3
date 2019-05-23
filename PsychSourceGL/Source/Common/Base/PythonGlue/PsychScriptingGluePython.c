@@ -443,7 +443,15 @@ PyObject* mxCreateString(const char* instring)
     // Try decoding from UTF-8:
     ret = PyUnicode_FromString(instring);
     PyErr_Clear();
+
+    #ifdef _WIN32
     if (!ret) {
+    	ret = PyUnicode_DecodeMBCS(instring, strlen(instring), NULL);
+        PyErr_Clear();
+    }
+    #endif
+
+	if (!ret) {
         #if PY_MAJOR_VERSION < 3
         // Fallback to standard C string decoding:
         ret = PyString_FromString(instring);
